@@ -15,15 +15,94 @@ import gpu
 
 def polypoint2D(point, color):
     """ Função usada para renderizar Polypoint2D. """
-    gpu.GPU.set_pixel(3, 1, 255, 0, 0) # altera um pixel da imagem
+    print("Pontos: ", point, color)
+    #Transforma a cor do formato X3D (0,1) para o do Framebuffer (0,255)
+    c0 = color[0]*255
+    c1 = color[1]*255
+    c2 = color[2]*255
+    i = 0
+    while (i < len(point)):
+        x = int(point[i])
+        y = int(point[i+1])
+        
+        print("Ponto: ", x, y, " Cor: ", c0, c1, c2)
+        gpu.GPU.set_pixel(x, y, c0, c1, c2)
+
+        i+=2
+
+    #gpu.GPU.set_pixel(3, 1, c0, c1, c2) # altera um pixel da imagem
     # cuidado com as cores, o X3D especifica de (0,1) e o Framebuffer de (0,255)
 
 def polyline2D(lineSegments, color):
     """ Função usada para renderizar Polyline2D. """
-    x = gpu.GPU.width//2
-    y = gpu.GPU.height//2
-    gpu.GPU.set_pixel(x, y, 255, 0, 0) # altera um pixel da imagem
 
+    #Transforma a cor do formato X3D (0,1) para o do Framebuffer (0,255)
+    c0 = color[0]*255
+    c1 = color[1]*255
+    c2 = color[2]*255
+    
+    #Pontos 0 e 1 no segmento
+    x0 = lineSegments[0]
+    y0 = lineSegments[1]
+    x1 = lineSegments[2]
+    y1 = lineSegments[3]
+
+    print("Linha: ", x0, y0, x1, y1, "Cor: ", c0, c1, c2)
+
+    #inclinação da linha
+    #s = (y1-y0)/((x1-x0)*y0)
+    #print("Inclinacao: ", s)
+
+    def plotLineLow(x0,y0,x1,y1):        
+        dx = x1-x0
+        dy = y1-y0
+        yi = 1
+        if dy < 0:
+            yi  = -1
+            dy = -dy
+        d = 2*dy - dx
+        x = x0
+        y = y0
+        while (x < x1 and abs(y) < gpu.GPU.height and abs(x) < gpu.GPU.width):
+            gpu.GPU.set_pixel(int(x), int(y), c0, c1, c2) # altera um pixel da imagem
+            if d > 0:
+                y = y+yi
+                d = d - 2*dx
+            d = d+2*dy      
+            x+=1
+
+    def plotLineHigh(x0,y0,x1,y1):
+        dx = x1-x0
+        dy = y1-y0
+        xi = 1
+        if dx < 0:
+            xi = -1
+            dx = -dx
+        d = 2*dx - dy
+        x = x0
+        y = y0
+        while (y < y1 and y < gpu.GPU.height and x < gpu.GPU.width):
+            gpu.GPU.set_pixel(int(x), int(y), c0, c1, c2) # altera um pixel da imagem
+            if d > 0:
+                x = x+xi
+                d = d - 2*dy
+            d = d+2*dx       
+            y+=1
+
+    def plotLine(x0,y0,x1,y1):
+        if(abs(y1-y0) < abs(x1-x0)):
+            if x0 > x1:
+                plotLineLow(x1,y1,x0,y0)
+            else:
+                plotLineLow(x0,y0,x1,y1)
+        else:
+            if y0 > y1:
+                plotLineHigh(x1,y1,x0,y0)
+            else:
+                plotLineHigh(x0,y0,x1,y1)
+
+    plotLine(x0,y0,x1,y1)
+    
 def triangleSet2D(vertices, color):
     """ Função usada para renderizar TriangleSet2D. """
     gpu.GPU.set_pixel(24, 8, 255, 255, 0) # altera um pixel da imagem

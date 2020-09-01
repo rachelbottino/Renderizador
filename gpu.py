@@ -17,5 +17,6 @@ class GPU:
         GPU._frame_buffer = np.zeros((height, width, 3), dtype=np.uint8) # cria imagem com fundo preto
     
     def set_pixel(u, v, r, g, b):
-        GPU._frame_buffer[v][u] = [r, g, b] # altera um pixel da imagem
+    	#print("GPU: ", u, v, r, g, b)
+    	GPU._frame_buffer[v][u] = [r, g, b] # altera um pixel da imagem
         # Perceba que a matriz é organizada em linhas e colunas, ou seja, y e x
