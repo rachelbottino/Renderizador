@@ -13,6 +13,8 @@ import interface
 # GPU
 import gpu
 
+import math
+
 def polypoint2D(point, color):
     """ Função usada para renderizar Polypoint2D. """
     print("Pontos: ", point, color)
@@ -111,13 +113,6 @@ def triangleSet2D(vertices, color):
     g = color[1]*255
     b = color[2]*255
 
-    gpu.GPU.set_pixel(1, 1, r, g, b) # altera um pixel da imagem
-
-
-
-
-    print("color: ", r, g, b)
-
     #vertices
     x0 = vertices[0]
     y0 = vertices[1]
@@ -127,46 +122,48 @@ def triangleSet2D(vertices, color):
     y2 = vertices[5]
 
     def reta(xa, ya, xb, yb, x, y):
-
         a0 = (yb-ya)
         b0 = (xb-xa)
         c0 = (ya*(xb-xa)-xa*(yb-ya))
-        print(a0*x - b0*y + c0)
-        return(a0*(x+0.5) - b0*(y+0.5) + c0)
+        return(a0*x - b0*y + c0)
 
-    '''
-    a1 = (y2-y1)
-    b1 = (x1-x2)
-    c1 = y1*(x2-x1) - x1*(y2-y1)
-    #c1 = (x1*y2 - (x2*y1))
-
-    a2 = (y0-y2)
-    b2 = (x2-x0)
-    c2 = y2*(x0-x2) - x2*(y0-y2)'''
-    #c2 = (x2*y0 - (x0*y2))
-    '''
-    print("EQUACAO:", a0,"*COMP",b0,"*alt+",c0 )
-    print("EQUACAO:", a1,"*COMP",b1,"*alt+",c1 )
-    print("EQUACAO:", a2,"*COMP",b2,"*alt+",c2 )'''
-    
     alt = 0
     comp = 0
+    comp_pixel = 0.5
     for alt in range(gpu.GPU.height):
         for comp in range(gpu.GPU.width):
-            #print(comp, alt)
-            '''
-            r0 = a0*comp - b0*alt + c0
-            r1 = a1*comp - b1*alt + c1
-            r2 = a2*comp - b2*alt + c2'''
-            #print(r0,r1,r2)
-            r0 = reta(x0,y0,x1,y1,comp,alt)
-            r1 = reta(x1,y1,x2,y2,comp,alt)
-            r2 = reta(x2,y2,x0,y0,comp,alt)
-
+            #NO PIXEL
+            porcent_pixel = 0
+            p = 0
+            q = 0
+            #DIVIDINDO O PIXEL EM 4:
+            #PRIMEIRO QUADRANTE
+            r0 = reta(x0,y0,x1,y1,comp+(0.25),alt+(0.25))
+            r1 = reta(x1,y1,x2,y2,comp+(0.25),alt+(0.25))
+            r2 = reta(x2,y2,x0,y0,comp+(0.25),alt+(0.25))
             if(r0>=0 and r1>=0 and r2>=0):
-                print("DENTRO DO TRIANGULO")
-                print("PIXEL ",comp,",",alt)
-                gpu.GPU.set_pixel(comp, alt, r, g, b) # altera um pixel da imagem
+                porcent_pixel+= 0.25
+            #SEGUNDO QUADRANTE
+            r0 = reta(x0,y0,x1,y1,comp+(0.75),alt+(0.25))
+            r1 = reta(x1,y1,x2,y2,comp+(0.75),alt+(0.25))
+            r2 = reta(x2,y2,x0,y0,comp+(0.75),alt+(0.25))
+            if(r0>=0 and r1>=0 and r2>=0):
+                porcent_pixel+= 0.25
+            #TERCEIRO QUADRANTE
+            r0 = reta(x0,y0,x1,y1,comp+(0.25),alt+(0.75))
+            r1 = reta(x1,y1,x2,y2,comp+(0.25),alt+(0.75))
+            r2 = reta(x2,y2,x0,y0,comp+(0.25),alt+(0.75))
+            if(r0>=0 and r1>=0 and r2>=0):
+                porcent_pixel+= 0.25
+            #SEGUNDO QUADRANTE
+            r0 = reta(x0,y0,x1,y1,comp+(0.75),alt+(0.75))
+            r1 = reta(x1,y1,x2,y2,comp+(0.75),alt+(0.75))
+            r2 = reta(x2,y2,x0,y0,comp+(0.75),alt+(0.75))
+            if(r0>=0 and r1>=0 and r2>=0):
+                porcent_pixel+= 0.25
+
+            if porcent_pixel > 0:
+                gpu.GPU.set_pixel(comp, alt, r*porcent_pixel, g*porcent_pixel, b*porcent_pixel) # altera um pixel da imagem
 
 LARGURA = 30
 ALTURA = 20
