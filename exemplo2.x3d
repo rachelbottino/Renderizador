@@ -9,6 +9,12 @@
                     <Material diffuseColor='0 1 0'/>
                 </Appearance>
             </Shape>
+            <Shape>
+                <Polyline2D lineSegments='5.5 13.1 2.2 20.1'/>
+                <Appearance>
+                    <Material diffuseColor='0 1 0'/>
+                </Appearance>
+            </Shape>
         </Transform>
         <Transform>
             <Shape>

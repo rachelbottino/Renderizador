@@ -105,7 +105,51 @@ def polyline2D(lineSegments, color):
     
 def triangleSet2D(vertices, color):
     """ Função usada para renderizar TriangleSet2D. """
-    gpu.GPU.set_pixel(24, 8, 255, 255, 0) # altera um pixel da imagem
+
+    #Transforma a cor do formato X3D (0,1) para o do Framebuffer (0,255)
+    c0 = color[0]*255
+    c1 = color[1]*255
+    c2 = color[2]*255
+
+    #vertices
+    x0 = vertices[0]
+    y0 = vertices[1]
+    x1 = vertices[2]
+    y1 = vertices[3]
+    x2 = vertices[4]
+    y2 = vertices[5]
+
+    a0 = (y0-y1)
+    b0 = (x1-x0)
+    #c0 = y0*(x1-x0) - x0*(y1-y0)
+    c0 = (x0*x1 - (x1*y0))
+
+    a1 = (y1-y2)
+    b1 = (x2-x1)
+    #c1 = y1*(x2-x1) - x1*(y2-y1)
+    c1 = (x1*y2 - (x2*y1))
+
+    a2 = (y2-y0)
+    b2 = (x0-x2)
+    #c2 = y2*(x0-x2) - x2*(y0-y2)
+    c2 = (x2*y0 - (x0*y2))
+    print("EQUACAO:", a0,"*COMP",b0,"*alt+",c0 )
+    print("EQUACAO:", a1,"*COMP",b1,"*alt+",c1 )
+    print("EQUACAO:", a2,"*COMP",b2,"*alt+",c2 )
+    
+    alt = 0
+    comp = 0
+    for alt in range(gpu.GPU.height):
+        for comp in range(gpu.GPU.width):
+            print(comp, alt)
+            r0 = a0*comp + b0*alt + c0
+            r1 = a1*comp + b1*alt + c1
+            r2 = a2*comp + b2*alt + c2
+            print(r0,r1,r2)
+            if(r0<=0 and r1<=0 and r2<=0):
+                print("DENTRO DO TRIANGULO")
+                print("PIXEL ",comp,",",alt)
+                gpu.GPU.set_pixel(comp, alt, c0, c1, c2) # altera um pixel da imagem
 
 LARGURA = 30
 ALTURA = 20
