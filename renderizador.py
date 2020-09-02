@@ -108,6 +108,9 @@ def polyline2D(lineSegments, color):
 def triangleSet2D(vertices, color):
     """ Função usada para renderizar TriangleSet2D. """
 
+    nq = int(input('''\nDigite um numero para o Supersampling do Triangulo \n
+        (Lembrando que por exemplo 5 gera 5**2 áreas dentro do pixel e só numeros inteiros são aceitos) \n'''))
+
     #Transforma a cor do formato X3D (0,1) para o do Framebuffer (0,255)
     r = color[0]*255
     g = color[1]*255
@@ -136,8 +139,26 @@ def triangleSet2D(vertices, color):
             porcent_pixel = 0
             p = 0
             q = 0
-            #DIVIDINDO O PIXEL EM 4:
-            #PRIMEIRO QUADRANTE
+            #DIVIDINDO O PIXEL EM N PARTES:
+            #nq = 5
+            dx = 0
+            dy = (1/(-nq*2))
+            for i in range (0,nq,1):
+                dx = -1/(nq*2)
+                dy += 1/nq
+                for j in range (0,nq,1):
+                    dx += 1/nq
+                    r0 = reta(x0,y0,x1,y1,comp+(dx),alt+(dy))
+                    r1 = reta(x1,y1,x2,y2,comp+(dx),alt+(dy))
+                    r2 = reta(x2,y2,x0,y0,comp+(dx),alt+(dy))
+                    if(r0>=0 and r1>=0 and r2>=0):
+                        porcent_pixel+= 1/(nq**2)
+            if porcent_pixel > 0:
+                print("PORCENTAGEM: ", porcent_pixel)
+                gpu.GPU.set_pixel(comp, alt, r*porcent_pixel, g*porcent_pixel, b*porcent_pixel) # altera um pixel da imagem
+                     
+
+'''
             r0 = reta(x0,y0,x1,y1,comp+(0.25),alt+(0.25))
             r1 = reta(x1,y1,x2,y2,comp+(0.25),alt+(0.25))
             r2 = reta(x2,y2,x0,y0,comp+(0.25),alt+(0.25))
@@ -164,7 +185,7 @@ def triangleSet2D(vertices, color):
 
             if porcent_pixel > 0:
                 gpu.GPU.set_pixel(comp, alt, r*porcent_pixel, g*porcent_pixel, b*porcent_pixel) # altera um pixel da imagem
-
+'''
 LARGURA = 30
 ALTURA = 20
 
